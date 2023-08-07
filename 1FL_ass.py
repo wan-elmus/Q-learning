@@ -1,5 +1,4 @@
 
-
 from pathlib import Path
 from typing import NamedTuple
 
@@ -113,11 +112,12 @@ class EpsilonGreedyPolicy:
             # Break ties randomly
             # If all actions are the same for this state, we choose a random one
             # (otherwise `np.argmax()` would always take the first one)
-            if np.all(q_table[state[0], :] == q_table[state[0], 0]):
+            if np.all(q_table[state, :] == q_table[state, 0]):
                 action = action_space.sample()
             else:
-                action = np.argmax(q_table[state[0], :])
+                action = np.argmax(q_table[state, :])
         return action
+
 
 rng = np.random.default_rng()  # Create an instance of the random number generator
 explorer = EpsilonGreedyPolicy(epsilon=params.epsilon, rng=rng)  # Pass the rng instance to the EpsilonGreedyPolicy class 
@@ -144,27 +144,31 @@ def run_env(params):
 
         for episode in tqdm(episodes, desc=f"Run {run+1}/{params.n_runs} - Episodes", leave=False):
             state = env.reset()  # state is a tuple, e.g., (0,)
+            state = state[0]  # Convert state to a scalar integer
             step = 0
             done = False
             total_rewards = 0
+            
+            
+            
 
             while not done:
                 action = explorer.choose_action(action_space=env.action_space, state=state, q_table=learner.q_table)
-                
+
                 # Log all states and actions
-                all_states.append(state.item())  # Convert state to a scalar integer
+                all_states.append(state)  # Append the scalar state value
                 all_actions.append(action)
 
                 # Take the action (a) and observe the outcome state(s') and reward (r)
-                new_state, reward, done, _ = env.step(action)
+                new_state, reward, done, _ = env.step(action)  # Store only the required values
 
-                learner.update(state.item(), action, reward, new_state.item())
+                learner.update(state, action, reward, new_state[0])  # Convert new_state to scalar integer
 
                 total_rewards += reward
                 step += 1
 
                 # Our new state is state
-                state = new_state
+                state = new_state[0]  # Convert new_state to scalar integer
 
             # Log all rewards and steps
             rewards[episode, run] = total_rewards
@@ -174,7 +178,6 @@ def run_env(params):
 
     env.close()  # Close the environment when done
     return rewards, steps, episodes, qtables, all_states, all_actions
-
 
 # Function to plot average rewards and steps for different hyperparameter settings
 def plot_hyperparameter_analysis(results, hyperparameter, hyperparameter_values, ylabel):
