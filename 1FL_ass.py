@@ -14,8 +14,6 @@ from gymnasium.envs.toy_text.frozen_lake import generate_random_map
 
 sns.set_theme()
 
-# %load_ext lab_black
-
 # Parameters
 
 # Define the parameters using NamedTuple
@@ -33,7 +31,7 @@ class FrozenLakeParams(NamedTuple):
     proba_frozen: float
     savefig_folder: Path
     
-# Create the FrozenLakeParams instance with the computed action_size and state_size
+# Create the FrozenLakeParams instance 
 params = FrozenLakeParams(
     total_episodes=2000,
     learning_rate=0.8,
@@ -63,19 +61,16 @@ env = gym.make(
     desc=None,  # The description of the map will be generated automatically
     map_name=None,
     is_slippery=params.is_slippery,
-    render_mode="rgb_array",  # Change to "rgb_array" if you want to visualize the environment
+    render_mode="rgb_array",  
 )
 
 # Update the params object with the correct state_size and action_size
 params = params._replace(action_size=env.action_space.n)
 params = params._replace(state_size=env.observation_space.n)
 
-env.close()  # Don't forget to close the environment after getting the sizes
-
+env.close()  
 
 # Creating the Q-Table
-
-# import numpy as np
 
 class QLearningTable:
     def __init__(self, gamma, learning_rate, state_size, action_size):
@@ -177,10 +172,10 @@ def run_env(params):
 
         qtables[run, :, :] = learner.q_table
 
-    env.close()  # Close the environment when done
+    env.close()  
     return rewards, steps, episodes, qtables, all_states, all_actions
 
-# Function to plot average rewards and steps for different hyperparameter settings
+# plot average rewards and steps for different hyperparameter settings
 def plot_hyperparameter_analysis(results, hyperparameter, hyperparameter_values, ylabel):
     fig, ax = plt.subplots(figsize=(8, 5))
     for i, value in enumerate(hyperparameter_values):
