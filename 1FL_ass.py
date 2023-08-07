@@ -155,20 +155,21 @@ def run_env(params):
             while not done:
                 action = explorer.choose_action(action_space=env.action_space, state=state, q_table=learner.q_table)
 
-                # Log all states and actions
-                all_states.append(state)  # Append the scalar state value
-                all_actions.append(action)
+            # Log all states and actions
+            all_states.append(state)  # Append the scalar state value
+            all_actions.append(action)
 
-                # Take the action (a) and observe the outcome state(s') and reward (r)
-                new_state, reward, done, _ = env.step(action)  # Store only the required values
+            # Take the action (a) and observe the outcome state(s') and reward (r)
+            new_state, reward, done, _, = env.step(action)  # Store only the required values
 
-                learner.update(state, action, reward, new_state[0])  # Convert new_state to scalar integer
+            learner.update(state, action, reward, new_state[0])  # Convert new_state to scalar integer
 
-                total_rewards += reward
-                step += 1
+            total_rewards += reward
+            step += 1
 
-                # Our new state is state
-                state = new_state[0]  # Convert new_state to scalar integer
+            # Our new state is state
+            state = new_state[0]  # Convert new_state to scalar integer
+
 
             # Log all rewards and steps
             rewards[episode, run] = total_rewards
